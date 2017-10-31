@@ -109,16 +109,21 @@ source("beta_mixture_model.r")
 # mandatory values: CHR_ID, START, END, CELL_POSI_INFO in first three and the last columns, respectively
 x <- read.table("test.candidate.txt")
 
-# create mat.out for storing the  
+# create mat.out for storing the output
 mat.out <- c()
 
-# read the information of one region each time (each row stores one candidate region) 
-for(i in 1:nrow(x)) {
- # read the last column "CELL_POSI_INFO" and store each cell into one element of the vector 
-    cells <- strsplit(as.character(x[i,ncol(x)]), ";")[[1]] 
+
+# read the information of each region for each time (each row stores one candidate region) 
+#for(i in 1:nrow(x)) 
+
+# here we take i=1 (1st region in the 1st row of input file) as an example
+i = 1
+{
+
+# read the last column "CELL_POSI_INFO" and store each cell into one element of the vector 
+cells <- strsplit(as.character(x[i,ncol(x)]), ";")[[1]] 
 
 # see what the data looks like for region i in cells
-# here we take i=1 (1st row) as an example
 cells
 [1] "Ser11:3839319_0_5:3839338_0_4:3839356_0_1:3839376_0_2:3839389_0_2:3839442_0_2:3839481_0_3:3839488_0_2:3839520_0_2:3839564_0_4:3839610_0_4"
 [2] "Ser18:3839442_0_1:3839481_3_3:3839488_0_3:3839520_0_3"
@@ -129,21 +134,26 @@ cells
 
 * Prepare input list for beta_mixture_model function
 ```r
-    mat.list <- list(NULL); cell.names <- c()
-	# read the information of each cell
-    for(j in 1:length(cells)) {
-		# read the methylation calls of each CpG site in cell j
+mat.list <- list(NULL); cell.names <- c()
+# read the information of each cell
+for(j in 1:length(cells)) {
+	# read the methylation calls of each CpG site in cell j
         meth.count <- strsplit(strsplit(cells[j], ":")[[1]], "_")
         meth.count <- unlist(meth.count)
-# the cell.names will store the cell names (5 in this case)
+	
+	# the cell.names will store the cell names (5 in this case)
         cell.names <- c(cell.names, meth.count[1])
-        meth.count <- meth.count[2:length(meth.count)]
+        
+	meth.count <- meth.count[2:length(meth.count)]
+	# meth.count stores the methylated calls and total calls for each CpG site in region i of cell j
         meth.count <- matrix(as.numeric(meth.count), length(meth.count)/3, 3, byrow=T)[,2:3]
-		# meth.count includes the methylated calls and total calls for each CpG site in region i of cell j
-		# rows represent all CpG sites in region i of cell j, columns represent the methylated calls and total calls
+	
+	# the mat.list will store the meth.count for all cells 
+	if(is.null(mat.list[[1]])) mat.list <- list(meth.count) else mat.list <- c(mat.list, list(meth.count))
+}
 
-
-# see what the data looks like for cell j of region i in meth.count, here we take j=5 (5th cell, Ser6) as an example
+# see what the data looks like for the cell j of region i in meth.count, here it will be 5th cell, Ser6
+# rows represent all CpG sites in region i of cell j, columns represent the methylated calls and total calls
 meth.count
       [,1] [,2]
  [1,]    1    1
@@ -159,16 +169,12 @@ meth.count
 [11,]    1    1
 [12,]    0    1
 
-		# the mat.list will store the meth.count for all cells 
-        if(is.null(mat.list[[1]])) mat.list <- list(meth.count) else mat.list <- c(mat.list, list(meth.count))
-}
 names(mat.list) <- cell.names
-
-
 # check the cells of region i in cell.names
 # example of i=1, 5 cells in this case
 cell.names
 [1] "Ser11" "Ser18" "Ser19" "Ser4"  "Ser6" 
+
 # see what the data looks like for Ser11 of region i in mat.list
 mat.list[1]
 $Ser11
@@ -204,11 +210,17 @@ output
            chisq.value               LRT.pval               variance 
     "57.0646802255275" "4.06033749155989e-13"  "0.00149159733739751" 
 
-# calculate the confidence interval of methylation variance and combined to output
+  # calculate the confidence interval of methylation variance and combined to output
   ci <- quantile(variance_boot_ci(mat.list), c(0.025, 0.975)) 
   mat.out <- rbind(mat.out, c(output, ci))
-}
 
+} 
+```
+
+* Produce putative CSM loci
+```r
+
+### the following need reading all regions. Use for(i in 1:nrow(x)) instead of i = 1 in the section of "Read in input file"
 
 # formatting and outputting
 label <- colnames(mat.out)
@@ -218,10 +230,6 @@ mat.out <- cbind(x[,1:3], mat.out, p.adjust(as.numeric(paste(mat.out[,14])), met
 colnames(mat.out) <- c("chr", "start", "end", label, "LRT.pval.adjusted") 
 # for your own analysis, replace the output file name
 write.table(mat.out, file="test.candidate.BetaMixtureModelResult.txt", quote=F, sep="\t", row.names=F, col.names=T)
-```
-
-* Produce putative CSM loci
-```r
 # get csm with the following cutoffs:
 # 1, valid cluster1 and cluster2: avg.m1 != -1; avg.m2 != -1
 # 2, observed minimum methylation difference of two methylation states: min.delta >0.1
