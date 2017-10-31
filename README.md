@@ -210,9 +210,9 @@ output
            chisq.value               LRT.pval               variance 
     "57.0646802255275" "4.06033749155989e-13"  "0.00149159733739751" 
 
-  # calculate the confidence interval of methylation variance and combined to output
-  ci <- quantile(variance_boot_ci(mat.list), c(0.025, 0.975)) 
-  mat.out <- rbind(mat.out, c(output, ci))
+# calculate the confidence interval of methylation variance and combined to output
+ci <- quantile(variance_boot_ci(mat.list), c(0.025, 0.975)) 
+mat.out <- rbind(mat.out, c(output, ci))
 
 } 
 ```
@@ -220,7 +220,8 @@ output
 * Produce putative CSM loci
 ```r
 
-### the following need reading all regions. Use for(i in 1:nrow(x)) instead of i = 1 in the section of "Read in input file"
+### to run the following code, it is better to read all regions of input file to perform an accurate p-value correcting. 
+### Use for(i in 1:nrow(x)) instead of i = 1 in the section of "Read in input file"
 
 # formatting and outputting
 label <- colnames(mat.out)
