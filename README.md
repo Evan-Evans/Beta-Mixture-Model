@@ -2,14 +2,14 @@ Beta mixture model
 ========
 
 # Introduction
-We developed a beta mixture model to identify putative CSM loci from the candidate CSM regions. Our assumptions for beta mixture model were that the methylation patterns of each CpG site follow Binomial distribution and the methylation probability of the CpG site (θ) follows Beta distribution. Here we assumed that the Beta distribution for hyper-methylated state vs hypo-methylated state of the same CpG site are distinct, leading to the distinct θ for two states, with θ1 and θ2 indicated methylation probabilities of hyper-methylated and hypo-methylated state, respectively. For each candidate region, the probability for a cell to be each methylation state (P1 for hyper-methylated state and P2 for hypo-methylated state) was estimated by EM algorithms, and which methylation state this cell attributed to was determined by comparing P1 and P2.
+We developed a beta mixture model to identify putative CSM loci from the candidate CSM regions. Suppose that there are two methylation states which include hyper-methylated state and hypo-methylated state in a given candidate region. Here we assumed that the methylation probabilities of hyper-methylated state and hypo-methylated state are estimated by two distinct the Beta distributions, leading to the distinct θ for two states, with θ(1) and θ(2) indicated methylation probabilities of hyper-methylated and hypo-methylated states, respectively. For each candidate region, the two probabilities were estimated by EM algorithms.
 # How to Use
-The beta mixture model includes two R scripts, run_beta_mixture_model.R reading in input file and outputting results, and beta_mixture_model.r performing principal statistical analysis, called by run_beta_mixture_model.R. 
+The beta mixture model includes two R scripts, *run_beta_mixture_model.R* reading in input file and outputting results, and *beta_mixture_model.r* performing principal statistical analysis, called by run_beta_mixture_model.R. 
 Prepare the input file as the required format, with mandatory values: CHR_ID, START, END, CELL_POSI_INFO in first three and the last columns, respectively.
 * INPUT: the information of methylation statistics of candidate CSM regions
 * OUTPUT1: the result of beta mixture model of candidate CSM regions 
 * OUTPUT2: the result of beta mixture model of putative CSM loci
-* USAGE: Rscript run_beta_mixture_model.R 
+* USAGE: *Rscript run_beta_mixture_model.R* 
 ### INPUT FORMAT
 
 The candidate region file is tab separated and contains following columns:
