@@ -152,7 +152,7 @@ for(j in 1:length(cells)) {
 	if(is.null(mat.list[[1]])) mat.list <- list(meth.count) else mat.list <- c(mat.list, list(meth.count))
 }
 
-# see what the data looks like for the cell j of region i in meth.count, here it will be 5th cell, Ser6
+# see what the data looks like for cell j of region i in meth.count, here we take the last cell (j=5 in this case, that is 5th cell, Ser6) as an example
 # rows represent all CpG sites in region i of cell j, columns represent the methylated calls and total calls
 meth.count
       [,1] [,2]
@@ -175,7 +175,7 @@ names(mat.list) <- cell.names
 cell.names
 [1] "Ser11" "Ser18" "Ser19" "Ser4"  "Ser6" 
 
-# see what the data looks like for Ser11 of region i in mat.list
+# see what the data looks like for the first element of region i in mat.list (Ser11 in this case)
 mat.list[1]
 $Ser11
       [,1] [,2]
